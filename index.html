@@ -5,14 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather app</title>
     <link rel="stylesheet" href="styles/style.css">
+    <!-- <script src="scripts/inputScript.js"></script> -->
 </head>
 <body>
     <section class="top-banner">
   <div class="container">
     <h1 class="heading">Bopper Weather App</h1>
-    <form>
+    <form id="search-city-form">
       <input type="text" placeholder="Please enter a city name" autofocus>
-      <button type="submit">SUBMIT</button>
+      <button type="submit" id="city-search-button">SEARCH</button>
       <span class="msg"></span>
     </form>
   </div>
@@ -22,5 +23,6 @@
     <ul class="cities"></ul>
   </div>
 </section>
+    <script src="scripts/inputScript.js"></script>
 </body>
 </html>
