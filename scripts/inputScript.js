@@ -3,10 +3,41 @@ const apiKey = "3727298d5f718b4abe846f814a39ada9";
 const input = document.querySelector('input');
 const msg = document.querySelector('.msg')
 const list = document.querySelector('.cities');
+const listArray = Array.from(list);
+
+const isCityAlreadyAdded = (inputVal) => {
+    const listItems = document.querySelectorAll(".ajax-section .city");
+    
+    // Используем Array.from для преобразования NodeList в массив и метод .some()
+    return Array.from(listItems).some(el => {
+        let content = "";
+        
+        if (inputVal.includes(",")) {
+            if (inputVal.split(",")[1].length > 2) {
+                inputVal = inputVal.split(",")[0];
+                content = el.querySelector(".city-name span").textContent.toLowerCase();
+            } else {
+                content = el.querySelector(".city-name").dataset.name.toLowerCase();
+            }
+        } else {
+            content = el.querySelector(".city-name span").textContent.toLowerCase();
+        }
+
+        return content === inputVal.toLowerCase();
+    });
+};
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   const inputValue = input.value;
+
+  if (isCityAlreadyAdded(inputValue)) {
+    msg.textContent = 'Oh, you already know the weather for this city :0';
+    form.reset();
+    input.focus();
+    return;
+  }
+
   const url = `https://api.openweathermap.org/data/2.5/weather?q=${inputValue}&appid=${apiKey}&units=metric`;
 
   console.log(url);
