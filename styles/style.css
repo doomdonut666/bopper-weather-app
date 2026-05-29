@@ -183,3 +183,46 @@ body {
   width: 100px;
   height: 100px;
 }
+
+.city {
+    position: relative;
+}
+
+/* Основной стиль кнопки */
+.clear-all-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #ff4757;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s;
+    display: none;
+}
+
+.clear-all-btn:hover {
+    background-color: var(--orange);
+    transform: translateY(-2px);
+}
+
+.clear-all-btn:active {
+    transform: translateY(0);
+}
+
+.remove-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    color: var(--text_dark);
+}
+
+.remove-btn:hover {
+    color: var(--orange);
+}

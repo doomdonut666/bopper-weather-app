@@ -3,41 +3,21 @@ const apiKey = "3727298d5f718b4abe846f814a39ada9";
 const input = document.querySelector('input');
 const msg = document.querySelector('.msg')
 const list = document.querySelector('.cities');
+const clearAllBtn = document.querySelector('.clear-all-btn')
+
+const toggleClearButton = () => {
+  const hasCities = list.children.length > 0;
+  clearAllBtn.style.display = hasCities ? 'block' : 'none';
+};
 
 // render function
 const renderCity = (data) => {
   const li = createLiElementUsingData(data);
   list.append(li);
   saveCities(data.name); // saving citties
+  toggleClearButton();
 };
 
-window.addEventListener('load', async () => {
-  const savedCities = JSON.parse(localStorage.getItem('myCities')) || [];
-
-  if (savedCities.length === 0) {
-    return;
-  }
-
-  try {
-    const fetchPromises = savedCities.map(async (cityName) => {
-      const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`)
-
-      if (!response.ok) {
-        throw new Error(`Error! City ${cityName} not found!`);
-      }
-
-      return response.json();
-    });
-
-    const citiesData = await Promise.all(fetchPromises);
-    
-    citiesData.forEach((data) => renderCity(data));
-
-  } catch (error) {
-    console.error(error);
-    msg.textContent(`Oops! I can't load some cities. Look in the console :(`);
-  }
-});
 
 // save cities list to localstorage
 const saveCities = (city) => {
@@ -48,6 +28,12 @@ const saveCities = (city) => {
   }
 };
 
+const removeCityFromStorage = (cityName) => {
+  let cities = JSON.parse(localStorage.getItem('myCities')) || [];
+  cities = cities.filter(city => city !== cityName);
+  localStorage.setItem('myCities', JSON.stringify(cities));
+};
+
 const createLiElementUsingData = (data) => {
   const { main, name, sys, weather } = data;
   const li = document.createElement("li");
@@ -55,14 +41,15 @@ const createLiElementUsingData = (data) => {
   const icon = `https://s3-us-west-2.amazonaws.com/s.cdpn.io/162656/${weather[0]["icon"]}.svg`;
 
   li.innerHTML = ` 
+    <button class="remove-btn">X</button>
     <h2 class="city-name" data-name="${name},${sys.country}"> 
         <span>${name}</span> 
         <sup>${sys.country}</sup> 
     </h2> 
     <div class="city-temp">${Math.round(main.temp)}<sup>°C</sup></div> 
     <figure> 
-        <img class="city-icon" src=${icon} alt=${weather[0]["main"]}> 
-        <figcaption>${weather[0]["description"]}</figcaption> 
+    <img class="city-icon" src=${icon} alt=${weather[0]["main"]}> 
+    <figcaption>${weather[0]["description"]}</figcaption> 
     </figure> 
   `;
   return li;
@@ -92,6 +79,36 @@ const isCityAlreadyAdded = (inputVal) => {
   });
 };
 
+window.addEventListener('load', async () => {
+  const savedCities = JSON.parse(localStorage.getItem('myCities')) || [];
+
+  if (savedCities.length === 0) {
+    return;
+  }
+
+  try {
+    const fetchPromises = savedCities.map(async (cityName) => {
+      const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`)
+
+      if (!response.ok) {
+        throw new Error(`Error! City ${cityName} not found!`);
+      }
+
+      return response.json();
+    });
+
+    const citiesData = await Promise.all(fetchPromises);
+
+    citiesData.forEach((data) => renderCity(data));
+
+  } catch (error) {
+    console.error(error);
+    msg.textContent(`Oops! I can't load some cities. Look in the console :(`);
+  }
+
+  toggleClearButton();
+});
+
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   const inputValue = input.value;
@@ -118,4 +135,27 @@ form.addEventListener('submit', async (e) => {
 
   form.reset();
   input.focus();
+});
+
+list.addEventListener('click', (e) => {
+  // remove one city
+  if (e.target.classList.contains('remove-btn')) {
+    const li = e.target.parentElement;
+    const cityName = li.querySelector('.city-name span').textContent;
+    li.remove();
+    removeCityFromStorage(cityName);
+    toggleClearButton();
+  }
+});
+
+clearAllBtn.addEventListener('click', () => {
+  // clearing cities list
+  list.innerHTML = '';
+
+  // removing cities from localstorage
+  localStorage.removeItem('myCities');
+
+  // msg for user
+  msg.textContent = 'All cities cleared! :)';
+  toggleClearButton();
 });
