@@ -25,6 +25,7 @@ button {
 }
  
 input {
+  appearance: none;
   -webkit-appearance: none;
 }
 
